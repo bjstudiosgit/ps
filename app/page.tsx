@@ -13,7 +13,6 @@ export default function Home(){
  return <div className="portal">
    <header className="masthead">
      <div className="brand">PACK<span>SOCIETY</span></div>
-     <span className="header-note">Membership registration</span>
    </header>
    <main>
      <div className="signup-hero">
