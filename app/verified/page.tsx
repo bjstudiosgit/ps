@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import { Check } from 'lucide-react';
-import Image from 'next/image';
+import Link from 'next/link';
+import BatchProductImage from '@/components/batch-product-image';
+import { findProductImage } from '@/lib/product-images';
 import { normalizeCode } from '@/lib/batch-validation';
 import { findBatch } from '@/lib/batches';
 
@@ -12,6 +14,7 @@ export default async function VerifiedPage({ searchParams }: { searchParams: Pro
   try { code = normalizeCode(input); } catch { notFound(); }
   const batch = await findBatch(code);
   if (!batch) notFound();
+  const productImage = await findProductImage(batch.code);
 
   return <div className="portal">
     <header className="masthead"><div className="brand">PACK<span>SOCIETY</span></div></header>
@@ -21,10 +24,8 @@ export default async function VerifiedPage({ searchParams }: { searchParams: Pro
       <p className="batch-code">Batch {batch.code}</p>
       <p>This batch number is recognised.</p>
       <h2 className="verified-product-name">{batch.name}</h2>
-      {batch.code === 'DEMO-001' && <figure className="verified-product">
-        <Image src="/products/demo-001.jpg" alt={batch.name + ' — batch ' + batch.code} width={3024} height={3024} priority />
-      </figure>}
-      <a className="text-button" href="/">Check another batch</a>
+      <BatchProductImage src={productImage} name={batch.name} code={batch.code} />
+      <Link className="text-button" href="/verify">Check another batch</Link>
     </section></div></main>
     <footer><div className="brand">PACK<span>SOCIETY</span></div><span>© {new Date().getFullYear()} Pack Society</span></footer>
   </div>;
