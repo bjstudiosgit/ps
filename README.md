@@ -1,6 +1,6 @@
 # Pack Society
 
-Customer journey: scan the pack QR code, play the dinosaur runner, then enter the batch number when the game ends. A matching active batch opens a separate page reading “Item verified” with the batch number and its saved name. Invalid or inactive numbers stay on the entry form with an error. No customer account or email is required.
+Customer journey: scan the pack QR code, play the dinosaur runner, then enter the batch number when the game ends. A matching active batch opens a separate page reading “Item verified” with the batch number, its saved name and a matching photo or placeholder. “Check another batch” opens `/verify` directly, without replaying the game. Invalid or inactive numbers stay on the entry form with an error. No customer account or email is required.
 
 ## Local development
 
@@ -25,7 +25,13 @@ Open `/admin` and sign in with `ADMIN_PASSWORD`. There is no public navigation l
 
 ## Local verification demo
 
-The local preview contains ten sample batches, `DEMO-001` through `DEMO-010`. Enter one after the game to test the verification result page. `DEMO-001` displays its product photo from `public/products/demo-001.jpg`; other demo batches remain text only until images are supplied. The sample records live only in ignored local development storage; hosted production has no seeded batch records. To add them again after a fresh checkout, start the local server and run `node --env-file=.env.local scripts/seed-demo-batches.mjs`.
+The local preview and the current hosted database contain ten sample batches, `DEMO-001` through `DEMO-010`. Enter one after the game, or at `/verify`, to test its result page. To seed a fresh local checkout, start the local server and run `node --env-file=.env.local scripts/seed-demo-batches.mjs`. This does not automatically seed a new production database.
+
+### Batch photos
+
+Place photos in `public/products`, named after their batch number: `demo-001.jpg`, `demo-002.jpg`, through `demo-010.jpg`. The same rule works for any active batch. JPG, JPEG, PNG and WebP are supported, in that priority order if multiple formats exist. Filename matching ignores case. Missing or unloadable photos show an “Image coming soon” placeholder with the batch number.
+
+Replace or rename files to swap photos; no page-code edit is needed. Refresh for local changes. Commit and push the images to deploy updates online. Photo URLs include a content version so replaced images do not keep showing an older cached photo. Titles always use the batch name saved in admin. See `public/products/README.md` for the full demo filename list.
 
 Batch numbers are indexed by a primary key in the hosted database. The public verification API returns only whether the number is recognised and its normalized code. The result page displays the saved batch name. Notes and stored links remain private.
 
