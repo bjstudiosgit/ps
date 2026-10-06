@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react';
 import { Check, ArrowUpRight } from 'lucide-react';
 import DinoGame from '@/components/dino-game';
+import DemoProductArt from '@/components/demo-product-art';
+import { getDemoProduct } from '@/lib/demo-products';
 import type { BatchLink } from '@/lib/batch-validation';
 type VerifiedBatch = { code: string; name: string; details: string; links: BatchLink[] };
 export default function Home() {
@@ -32,7 +34,9 @@ export default function Home() {
         <div className="success"><Check size={22} /> Batch verified</div>
         <h1 id="title" tabIndex={-1}>{batch.name}</h1>
         <p className="batch-code">Batch {batch.code}</p>
+        {getDemoProduct(batch.code) && <DemoProductArt product={getDemoProduct(batch.code)!} />}
         {batch.details && <p className="batch-details">{batch.details}</p>}
+        {getDemoProduct(batch.code) && <a className="demo-back" href={'/demo/' + batch.code}>View sample product page</a>}
         <div className="batch-links">{batch.links.map(link => <a key={link.url + link.label} href={link.url} target="_blank" rel="noopener noreferrer">{link.label}<ArrowUpRight size={20} /></a>)}</div>
         <button className="text-button" onClick={() => { setBatch(null); setCode(''); setError(''); }}>Check another batch</button>
       </> : <>

@@ -23,6 +23,10 @@ Open `/admin` and sign in with `ADMIN_PASSWORD`. There is no public navigation l
 - Edit product content or deactivate a batch. Inactive numbers cannot verify.
 - Existing numbers are skipped on bulk add; use Edit to change them.
 
+## Neutral product demo
+
+The local preview contains ten sample batches, `DEMO-001` through `DEMO-010`. Each maps to a distinct placeholder `Product 1` through `Product 10` page at `/demo/DEMO-001` through `/demo/DEMO-010`. Enter a demo batch number after the game to see its placeholder artwork and a link to its product page. The sample records live only in ignored local development storage; hosted production has no seeded batch records. To add them again after a fresh checkout, start the local server and run `node --env-file=.env.local scripts/seed-demo-batches.mjs`. Replace the placeholders with product information appropriate to your deployment.
+
 Batch numbers are indexed by a primary key in the hosted database. Details are plain text. Only http/https links are accepted. Invalid or inactive codes do not receive final-page content.
 
 A recognised batch proves the number is in the batch register. A copied number could appear on more than one physical pack; unique per-pack codes would be needed for stronger authenticity checks.
