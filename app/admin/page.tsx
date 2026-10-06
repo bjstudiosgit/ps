@@ -71,18 +71,12 @@ export default function Admin() {
           <form onSubmit={event => { event.preventDefault(); void action(save); }}>
             <label htmlFor="codes">Batch number{editing ? '' : 's'}</label>
             <textarea id="codes" rows={editing ? 1 : 3} required maxLength={6500} disabled={Boolean(editing) || busy} value={form.codes} placeholder="One number per line, or separate with commas" onChange={event => setForm({ ...form, codes: event.target.value })} />
-            {!editing && <p className="field-note">Add up to 100 numbers. Each gets the details and links below. Existing numbers are skipped.</p>}
-            <label htmlFor="product-name">Product name</label>
+            {!editing && <p className="field-note">Add up to 100 numbers. Each gets the admin label and notes below. Existing numbers are skipped.</p>}
+            <label htmlFor="product-name">Internal label (admin only)</label>
             <input id="product-name" required maxLength={120} value={form.name} disabled={busy} onChange={event => setForm({ ...form, name: event.target.value })} />
-            <label htmlFor="details">Final page details</label>
+            <label htmlFor="details">Internal notes (admin only)</label>
             <textarea id="details" rows={4} maxLength={4000} value={form.details} disabled={busy} onChange={event => setForm({ ...form, details: event.target.value })} />
-            <h3>Final page links</h3>
-            {form.links.map((link, index) => <div className="admin-link-row" key={index}>
-              <input aria-label={'Link ' + (index + 1) + ' label'} required maxLength={80} placeholder="Link label" value={link.label} disabled={busy} onChange={event => setForm({ ...form, links: form.links.map((item, i) => i === index ? { ...item, label: event.target.value } : item) })} />
-              <input aria-label={'Link ' + (index + 1) + ' address'} required type="url" maxLength={2048} placeholder="https://" value={link.url} disabled={busy} onChange={event => setForm({ ...form, links: form.links.map((item, i) => i === index ? { ...item, url: event.target.value } : item) })} />
-              <button type="button" className="text-button" disabled={busy} onClick={() => setForm({ ...form, links: form.links.filter((_, i) => i !== index) })}>Remove</button>
-            </div>)}
-            <button type="button" className="text-button" disabled={busy || form.links.length >= 8} onClick={() => setForm({ ...form, links: [...form.links, { label: '', url: '' }] })}>+ Add link</button>
+            <p className="field-note">Labels and notes are stored for admins. Visitors only see the verification result and batch number.</p>
             <label className="checkbox-label"><input type="checkbox" checked={form.active} disabled={busy} onChange={event => setForm({ ...form, active: event.target.checked })} />Active — customers can verify this batch</label>
             <div className="admin-actions"><button className="join-button" disabled={busy}>{busy ? 'Saving…' : editing ? 'Save changes' : 'Add batches'}</button>{editing && <button type="button" className="text-button" disabled={busy} onClick={reset}>Cancel edit</button>}</div>
           </form>
@@ -90,10 +84,10 @@ export default function Admin() {
         <section className="admin-card">
           <h2>{total} batch{total === 1 ? '' : 'es'}</h2>
           <form className="admin-search" onSubmit={event => { event.preventDefault(); void action(() => load(token, query, 1)); }}>
-            <input aria-label="Search batches" placeholder="Search by batch number or product name" maxLength={120} value={query} onChange={event => setQuery(event.target.value)} />
+            <input aria-label="Search batches" placeholder="Search by batch number or internal label" maxLength={120} value={query} onChange={event => setQuery(event.target.value)} />
             <button className="join-button" disabled={busy}>Search</button>
           </form>
-          <div className="table-wrap"><table><thead><tr><th>Batch</th><th>Product</th><th>Status</th><th>Added</th><th>Action</th></tr></thead><tbody>
+          <div className="table-wrap"><table><thead><tr><th>Batch</th><th>Internal label</th><th>Status</th><th>Added</th><th>Action</th></tr></thead><tbody>
             {batches.map(batch => <tr key={batch.code}><td className="batch-code">{batch.code}</td><td>{batch.name}</td><td>{batch.active ? 'Active' : 'Inactive'}</td><td>{new Date(batch.createdAt).toLocaleDateString('en-GB')}</td><td><button className="text-button" disabled={busy} onClick={() => edit(batch)}>Edit</button></td></tr>)}
             {!batches.length && <tr><td colSpan={5}>No batches found.</td></tr>}
           </tbody></table></div>
