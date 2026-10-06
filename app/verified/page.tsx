@@ -22,7 +22,7 @@ export default async function VerifiedPage({ searchParams }: { searchParams: Pro
       <p>This batch number is recognised.</p>
       <h2 className="verified-product-name">{batch.name}</h2>
       {batch.code === 'DEMO-001' && <figure className="verified-product">
-        <Image src="/products/demo-001.jpg" alt={batch.name + ' — batch ' + batch.code} width={1400} height={1150} priority />
+        <Image src="/products/demo-001.jpg" alt={batch.name + ' — batch ' + batch.code} width={3024} height={3024} priority />
       </figure>}
       <a className="text-button" href="/">Check another batch</a>
     </section></div></main>
