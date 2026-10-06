@@ -25,7 +25,7 @@ Open `/admin` and sign in with `ADMIN_PASSWORD`. There is no public navigation l
 
 ## Local verification demo
 
-The local preview contains ten sample batches, `DEMO-001` through `DEMO-010`. Enter one after the game to test the verification result page. The sample records live only in ignored local development storage; hosted production has no seeded batch records. To add them again after a fresh checkout, start the local server and run `node --env-file=.env.local scripts/seed-demo-batches.mjs`.
+The local preview contains ten sample batches, `DEMO-001` through `DEMO-010`. Enter one after the game to test the verification result page. `DEMO-001` displays its lemon photo from `public/products/demo-001.jpg`; other demo batches remain text only until images are supplied. The sample records live only in ignored local development storage; hosted production has no seeded batch records. To add them again after a fresh checkout, start the local server and run `node --env-file=.env.local scripts/seed-demo-batches.mjs`.
 
 Batch numbers are indexed by a primary key in the hosted database. The public verification API returns only whether the number is recognised and its normalized code. Existing stored names, notes, and links are not shown on the result page.
 
