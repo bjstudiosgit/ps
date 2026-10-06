@@ -15,6 +15,6 @@ export async function POST(request: Request) {
   try {
     const batch = await findBatch(code);
     if (!batch) return Response.json({ error: 'That batch number could not be verified. Check your pack and try again.' }, { status: 404, headers });
-    return Response.json({ batch: { code: batch.code, name: batch.name, details: batch.details, links: batch.links } }, { headers });
+    return Response.json({ verified: true, code: batch.code }, { headers });
   } catch { return Response.json({ error: 'Verification is temporarily unavailable. Please try again later.' }, { status: 503, headers }); }
 }
