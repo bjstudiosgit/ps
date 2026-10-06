@@ -20,9 +20,9 @@ export default async function VerifiedPage({ searchParams }: { searchParams: Pro
       <h1 id="title">Item verified</h1>
       <p className="batch-code">Batch {batch.code}</p>
       <p>This batch number is recognised.</p>
+      <h2 className="verified-product-name">{batch.name}</h2>
       {batch.code === 'DEMO-001' && <figure className="verified-product">
-        <Image src="/products/demo-001.jpg" alt="Lemons associated with batch DEMO-001" width={1400} height={1150} priority />
-        <figcaption>Lemons</figcaption>
+        <Image src="/products/demo-001.jpg" alt={batch.name + ' — batch ' + batch.code} width={1400} height={1150} priority />
       </figure>}
       <a className="text-button" href="/">Check another batch</a>
     </section></div></main>
