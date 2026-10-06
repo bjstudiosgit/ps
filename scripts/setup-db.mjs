@@ -9,8 +9,8 @@ if (!connectionString || connectionString.includes('USER:PASSWORD')) {
   try {
     const sql = neon(connectionString);
     const schema = await readFile(new URL('../db/schema.sql', import.meta.url), 'utf8');
-    await sql.query(schema);
-    console.log('Registration database is ready.');
+    for (const statement of schema.split(';').map(value => value.trim()).filter(Boolean)) await sql.query(statement);
+    console.log('Registration and batch database is ready.');
   } catch {
     console.error('Database setup failed. Check DATABASE_URL and database access.');
     process.exitCode = 1;

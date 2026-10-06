@@ -1,53 +1,52 @@
 # Pack Society
 
-A full-screen dinosaur runner followed by the Pack Society email signup. Public visitors do not need an account. The game and design are unchanged by the Vercel migration.
+Customer journey: scan the pack QR code, play the dinosaur runner, then enter the batch number when the game ends. A matching active batch opens its product details and links. No customer account or email is required.
 
 ## Local development
 
-Use Node.js 22.13 or newer (Node.js 24 recommended).
+Use Node.js 22.13 or newer. Run `npm ci`, then `npm run dev`. Open the terminal's local URL.
 
-1. Run `npm ci`.
-2. Copy `.env.example` to `.env.local` and replace the example `DATABASE_URL` with a Neon connection string.
-3. Run `npm run db:setup` once to create the registrations table.
-4. Run `npm run dev` and open the URL printed in the terminal.
+For a local preview, use these server-only settings in `.env.local`:
+- `ADMIN_PASSWORD`: a unique random password of at least 24 characters.
+- `BATCH_STORAGE=local`: enables development-only storage in ignored `work/batches.local.json`.
 
-The page and game work without a database connection. Signup correctly returns an error until storage is configured; it does not pretend to save an email.
+A random local admin password has been generated in `.env.local`. View it locally; do not commit or share that file. Local storage persists on this PC but is not used in production.
 
-## Deploy to Vercel
+## Batch management
 
-1. Import this folder's Git repository into Vercel, or run the Vercel CLI from `E:\BJstudio\PackSociety`.
-2. Select **Next.js**. Use `npm ci` for installation and `npm run build` for the build. Leave the output directory at its Next.js default.
-3. Add a **Neon** database from Vercel Storage / Marketplace and connect it to the project. Ensure its connection string is available as the server-only environment variable `DATABASE_URL`. Do not prefix it with `NEXT_PUBLIC_`.
-4. Initialize the schema by running the contents of `db/schema.sql` in Neon's SQL editor. Alternatively, set the same database URL in local `.env.local` and run `npm run db:setup`. The command is safe to run again.
-5. Deploy. If an environment variable was added after deployment, redeploy to apply it.
-6. The intended customer site is public. In **Settings > Deployment Protection**, make sure the production domain does not require Vercel Authentication or a password. Check the production URL in a signed-out/private browser before printing QR codes.
+Open `/admin` and sign in with `ADMIN_PASSWORD`. There is no public navigation link to this page. Every management API request independently authenticates the password on the server. The browser retains the password only in memory; refresh or sign out to clear it.
 
-The checked-in `vercel.json` selects the Next.js preset. No OpenAI or Sites login is built into this version.
+- Add one batch number, or up to 100 at once using new lines or commas.
+- Numbers use 3–64 letters, numbers or hyphens. Matching ignores case and surrounding whitespace; leading zeros are preserved.
+- Set a product name, final-page details, and up to eight labelled web links.
+- Search the batch index by number or product name. Results are paginated.
+- Edit product content or deactivate a batch. Inactive numbers cannot verify.
+- Existing numbers are skipped on bulk add; use Edit to change them.
 
-## Database
+Batch numbers are indexed by a primary key in the hosted database. Details are plain text. Only http/https links are accepted. Invalid or inactive codes do not receive final-page content.
 
-The only stored field is `registrations.email`, a unique primary key. Queries are parameterized and duplicate emails do not create additional rows. Browser requests cannot retrieve the registration list.
+A recognised batch proves the number is in the batch register. A copied number could appear on more than one physical pack; unique per-pack codes would be needed for stronger authenticity checks.
 
-The earlier public Sites version at https://pack-society-portal.scientificbrad.chatgpt.site/ remains online separately. Its existing Cloudflare D1 records have **not** been copied into Neon. If contacts have already signed up there, export/import them before switching the QR code to Vercel. Moving this local project does not remove that published site.
+## Hosting on Vercel
 
-## Checks
+1. Import this Git repository into Vercel. Select Next.js, `npm ci`, and `npm run build`. Keep the default output directory.
+2. Connect a Neon database and configure server-only `DATABASE_URL`.
+3. Set a new strong server-only `ADMIN_PASSWORD`. Never prefix either setting with `NEXT_PUBLIC_`. Do not use development-only local storage in hosting.
+4. Set the same database URL locally and run `npm run db:setup`, or run `db/schema.sql` in Neon's SQL editor. Setup is safe to repeat and retains existing registrations.
+5. Deploy and check the public URL in a signed-out browser. Production must not require Vercel Authentication for customer access.
+6. Sign in at the production `/admin`, add the real batch numbers and final-page links, and test one active, one inactive and one incorrect number.
+7. Point the QR code at the final public home URL. The QR code opens the game; the batch number is separately printed beside the barcode.
 
-- `npm run build` — production build and TypeScript validation.
-- `npm test` — jump, landing, collision, and game lifecycle checks.
-- `npm run db:setup` — initialize configured Neon storage.
-- `npm start` — serve the production build locally.
+Production requires Neon and fails with a clear unavailable message if storage is not configured. Development batches are not automatically copied to Neon.
 
-A live Neon insert cannot be verified until a real `DATABASE_URL` is supplied.
+The earlier public Sites version at https://pack-society-portal.scientificbrad.chatgpt.site/ remains a separate site. Local changes do not update it. Existing Cloudflare D1 contacts have not been migrated.
 
-## Migration notes
+## Validation
 
-The source and Git history were moved from the Codex workspace to `E:\BJstudio\PackSociety`. The app now uses Next.js instead of Vinext/Cloudflare Workers. Original local Cloudflare state is retained in ignored work/legacy-cloudflare-state/ for reference. The original workspace project is retained as a recovery copy under the old workspace work/pack-society-before-vercel-source directory. Cloudflare/Sites build configuration was removed from the active project; the old version remains in Git history.
+- `npm test`: game physics, code validation, link safety, admin authorization and origin checks.
+- `npm run build`: production compilation and TypeScript validation.
+- `npm run db:setup`: initialize the configured Neon schema.
 
-Dinosaur sprites are from Chromium; their licence is in `public/CHROMIUM-LICENSE.txt`.
+The legacy email-registration API and table are retained for existing data, but the customer journey now uses batch verification.
 
-## Official setup references
-
-- [Next.js on Vercel](https://vercel.com/docs/frameworks/full-stack/nextjs)
-- [Neon integration for Vercel](https://vercel.com/marketplace/neon/neon)
-- [Neon serverless driver](https://neon.com/docs/serverless/serverless-driver)
-- [Vercel Authentication settings](https://vercel.com/docs/deployment-protection/methods-to-protect-deployments/vercel-authentication)
+Dinosaur and cloud sprites are from Chromium; see `public/CHROMIUM-LICENSE.txt`.

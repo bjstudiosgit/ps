@@ -2,11 +2,13 @@
 import { useEffect, useRef, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { createRun, jump, stepRun, GROUND, DINO_X } from '@/lib/dino-engine';
+import { createRun, getScore, jump, stepRun, GROUND, DINO_X } from '@/lib/dino-engine';
+import { createPlantSprites } from '@/lib/plant-sprites';
 
 // Dinosaur and scenery artwork: The Chromium Authors; see public/CHROMIUM-LICENSE.txt.
 export default function DinoGame({ onGameOver }: { onGameOver: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const scoreRef = useRef<HTMLOutputElement>(null);
   const actionRef = useRef<() => void>(() => {});
   const callbackRef = useRef(onGameOver);
   callbackRef.current = onGameOver;
@@ -21,6 +23,7 @@ export default function DinoGame({ onGameOver }: { onGameOver: () => void }) {
     const run = createRun(Math.max(260, canvas.clientWidth));
     const sprite = new Image();
     const plant = new Image();
+    const plantSprites = [plant, ...createPlantSprites()];
     let loadedImages = 0;
     function resize() {
       if (!canvas || !ctx) return;
@@ -43,11 +46,18 @@ export default function DinoGame({ onGameOver }: { onGameOver: () => void }) {
       ctx.translate(0, sceneHeight * 0.65 - GROUND);
       const groundOffset = run.distance % 600;
       for (let x = -groundOffset; x < run.width; x += 600) ctx.drawImage(sprite, 2, 54, 600, 12, x, GROUND - 10, 600, 12);
-      const cloudX = run.width - ((run.distance * 0.16 + 100) % (run.width + 100));
-      ctx.drawImage(sprite, 86, 2, 46, 14, cloudX, 42, 46, 14);
+      const cloudCount = Math.max(5, Math.ceil(run.width / 140));
+      const cloudSpan = run.width + 100;
+      for (let index = 0; index < cloudCount; index++) {
+        const drift = index % 2 === 0 ? 0.16 : 0.24;
+        const cloudX = run.width - ((run.distance * drift + index * cloudSpan / cloudCount) % cloudSpan);
+        const cloudY = 14 + (index * 29) % 68;
+        const cloudScale = index % 3 === 0 ? 1.4 : 1;
+        ctx.drawImage(sprite, 86, 2, 46, 14, cloudX, cloudY, 46 * cloudScale, 14 * cloudScale);
+      }
       const dinoFrame = run.dead ? 220 : !run.started || run.y > 0 ? 0 : 88 + Math.floor(run.elapsed * 10) % 2 * 44;
       ctx.drawImage(sprite, 848 + dinoFrame, 2, 44, 47, DINO_X, GROUND - 47 - run.y, 44, 47);
-      for (const obstacle of run.obstacles) ctx.drawImage(plant, obstacle.x, GROUND - obstacle.height, obstacle.width, obstacle.height);
+      for (const obstacle of run.obstacles) ctx.drawImage(plantSprites[obstacle.variant ?? 0], obstacle.x, GROUND - obstacle.height, obstacle.width, obstacle.height);
       ctx.restore();
     }
     function tick(now: number) {
@@ -55,6 +65,8 @@ export default function DinoGame({ onGameOver }: { onGameOver: () => void }) {
       if (!document.hidden) stepRun(run, last ? (now - last) / 1000 : 0);
       last = now;
       draw();
+      const score = String(getScore(run)).padStart(5, '0');
+      if (scoreRef.current && scoreRef.current.value !== score) scoreRef.current.value = score;
       if (run.dead) {
         setPhase('over');
         revealTimer = window.setTimeout(() => { if (active) callbackRef.current(); }, 600);
@@ -81,6 +93,7 @@ export default function DinoGame({ onGameOver }: { onGameOver: () => void }) {
     if (['Space', 'ArrowUp'].includes(e.code) && phase !== 'error' && phase !== 'loading') { e.preventDefault(); if (!e.repeat) play(); }
   }}>
     <canvas ref={canvasRef} className="dino-canvas" tabIndex={0} role="button" aria-label="Dinosaur game. Press Space or up arrow, or tap to jump over cannabis plants." onPointerDown={e => { e.preventDefault(); play(); }} />
+    <output ref={scoreRef} className="game-score" aria-label="Score" aria-live="off">00000</output>
     {phase === 'error' && <Button className="game-retry" aria-label="Game could not load. Retry." onClick={() => { setPhase('loading'); setAttempt(value => value + 1); }}><RotateCcw size={24}/></Button>}
   </div>;
 }
