@@ -1,6 +1,6 @@
 # Pack Society
 
-Customer journey: scan the pack QR code, play the dinosaur runner, then enter the batch number when the game ends. A matching active batch opens a separate page reading “Item verified” with the batch number. Invalid or inactive numbers stay on the entry form with an error. No customer account or email is required.
+Customer journey: scan the pack QR code, play the dinosaur runner, then enter the batch number when the game ends. A matching active batch opens a separate page reading “Item verified” with the batch number and its saved name. Invalid or inactive numbers stay on the entry form with an error. No customer account or email is required.
 
 ## Local development
 
@@ -18,16 +18,16 @@ Open `/admin` and sign in with `ADMIN_PASSWORD`. There is no public navigation l
 
 - Add one batch number, or up to 100 at once using new lines or commas.
 - Numbers use 3–64 letters, numbers or hyphens. Matching ignores case and surrounding whitespace; leading zeros are preserved.
-- Set an internal label and notes for admin reference. These are not displayed to visitors.
-- Search the batch index by number or internal label. Results are paginated.
-- Edit the internal label or deactivate a batch. Inactive numbers cannot verify.
+- Set the batch name shown on the verified item page, plus private notes for admin reference.
+- Search the batch index by number or name. Results are paginated; Clear search restores the full index.
+- Edit the batch name or deactivate a batch. Inactive numbers cannot verify. Use View item to preview an active batch's verification page.
 - Existing numbers are skipped on bulk add; use Edit to change them.
 
 ## Local verification demo
 
 The local preview contains ten sample batches, `DEMO-001` through `DEMO-010`. Enter one after the game to test the verification result page. `DEMO-001` displays its lemon photo from `public/products/demo-001.jpg`; other demo batches remain text only until images are supplied. The sample records live only in ignored local development storage; hosted production has no seeded batch records. To add them again after a fresh checkout, start the local server and run `node --env-file=.env.local scripts/seed-demo-batches.mjs`.
 
-Batch numbers are indexed by a primary key in the hosted database. The public verification API returns only whether the number is recognised and its normalized code. Existing stored names, notes, and links are not shown on the result page.
+Batch numbers are indexed by a primary key in the hosted database. The public verification API returns only whether the number is recognised and its normalized code. The result page displays the saved batch name. Notes and stored links remain private.
 
 A recognised batch proves the number is in the batch register. A copied number could appear on more than one physical pack; unique per-pack codes would be needed for stronger authenticity checks.
 
